@@ -1,0 +1,43 @@
+name: Test Action
+
+# This workflow demonstrates how to use the ProverCoderAI Release Action
+# It can be used as a reference for users implementing this action in their repositories
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Run in test mode (skip actual publishing)'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+  packages: write
+
+jobs:
+  test-release-action:
+    runs-on: ubuntu-latest
+    steps:
+      # Test using the action from the current repository
+      # In production, this would be: uses: ProverCoderAI/action-release@v1
+      - name: Test Release Action
+        uses: ./
+        with:
+          ref: ${{ github.sha }}
+          branch: ${{ github.ref_name }}
+          package_json_path: packages/app/package.json
+          pnpm_filter: ./packages/app
+          bump_type: patch
+          publish_npm: false  # Disabled for testing
+          publish_github_packages: false  # Disabled for testing
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display Results
+        if: always()
+        run: |
+          echo "Test completed"
+          echo "This workflow demonstrates the action usage"
+          echo "In production environments, enable publish_npm and publish_github_packages as needed"

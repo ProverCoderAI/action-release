@@ -2,6 +2,8 @@
 
 A GitHub Action for automated releases with changeset management, version bumping, npm/GitHub Packages publishing, and GitHub Release creation.
 
+> **Note**: For initial setup instructions and tag creation, see [SETUP.md](SETUP.md)
+
 ## Features
 
 - 🔄 Automatic version bumping using changesets
@@ -169,6 +171,34 @@ permissions:
     node_version: "20"
     github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+## Deployment and Versioning
+
+This action uses Git tags for versioning. Users reference the action using tag names:
+
+- `ProverCoderAI/action-release@v1` - Latest v1.x.x release (recommended for auto-updates)
+- `ProverCoderAI/action-release@v1.0.0` - Pinned to specific version (for stability)
+
+### For Maintainers
+
+After merging changes to main:
+
+1. Use the provided script to create release tags:
+   ```bash
+   ./scripts/create-release-tag.sh 1.0.0
+   ```
+
+2. Or manually create tags:
+   ```bash
+   git tag -a v1.0.0 -m "v1.0.0 - Release description"
+   git push origin v1.0.0
+
+   # Update major version pointer
+   git tag -fa v1 -m "v1 - Points to latest v1.x.x"
+   git push origin v1 --force
+   ```
+
+See [SETUP.md](SETUP.md) for detailed setup and deployment instructions.
 
 ## License
 
