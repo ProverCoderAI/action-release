@@ -1,43 +1,68 @@
-name: Test Action
+name: Validate Action
 
-# This workflow demonstrates how to use the ProverCoderAI Release Action
-# It can be used as a reference for users implementing this action in their repositories
+# This workflow validates that the action.yml is properly structured
+# Note: This repository contains only the action definition, not a full pnpm monorepo,
+# so we cannot run the action itself here. This workflow just validates the metadata.
 
 on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: 'Run in test mode (skip actual publishing)'
-        required: false
-        default: 'true'
-
-permissions:
-  contents: write
-  id-token: write
-  pull-requests: write
-  packages: write
 
 jobs:
-  test-release-action:
+  validate-action:
     runs-on: ubuntu-latest
     steps:
-      # Test using the action from the current repository
-      # In production, this would be: uses: ProverCoderAI/action-release@v1
-      - name: Test Release Action
-        uses: ./
-        with:
-          ref: ${{ github.sha }}
-          branch: ${{ github.ref_name }}
-          package_json_path: packages/app/package.json
-          pnpm_filter: ./packages/app
-          bump_type: patch
-          publish_npm: false  # Disabled for testing
-          publish_github_packages: false  # Disabled for testing
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Display Results
-        if: always()
+      - name: Validate action.yml structure
         run: |
-          echo "Test completed"
-          echo "This workflow demonstrates the action usage"
-          echo "In production environments, enable publish_npm and publish_github_packages as needed"
+          echo "Validating action.yml exists and is readable..."
+          if [ ! -f "action.yml" ]; then
+            echo "Error: action.yml not found"
+            exit 1
+          fi
+
+          echo "Checking required fields..."
+          if ! grep -q "^name:" action.yml; then
+            echo "Error: 'name' field missing"
+            exit 1
+          fi
+
+          if ! grep -q "^description:" action.yml; then
+            echo "Error: 'description' field missing"
+            exit 1
+          fi
+
+          if ! grep -q "^runs:" action.yml; then
+            echo "Error: 'runs' field missing"
+            exit 1
+          fi
+
+          echo "action.yml validation passed!"
+
+      - name: Verify composite action type
+        run: |
+          echo "Verifying this is a composite action..."
+          if ! grep -A 1 "^runs:" action.yml | grep -q "using: \"composite\""; then
+            echo "Error: Not a composite action"
+            exit 1
+          fi
+          echo "Composite action type confirmed!"
+
+      - name: Display action info
+        run: |
+          echo "Action Name: $(grep '^name:' action.yml | cut -d'"' -f2)"
+          echo "Action Description: $(grep '^description:' action.yml | cut -d'"' -f2)"
+          echo "Validation complete - action is ready to use!"
+          echo ""
+          echo "To use this action in your repository:"
+          echo "  - uses: ProverCoderAI/action-release@v1"
+          echo "    with:"
+          echo "      ref: \${{ github.sha }}"
+          echo "      github_token: \${{ secrets.GITHUB_TOKEN }}"
