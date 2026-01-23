@@ -99,7 +99,7 @@ jobs:
 | `readme_dest` | Destination path for README | No | `packages/app/README.md` |
 | `publish_npm` | Whether to publish to npm registry | No | `true` |
 | `publish_github_packages` | Whether to publish to GitHub Packages | No | `true` |
-| `skip_if_unchanged` | Skip version bump/publish if local package.json + dist match latest npm package | No | `false` |
+| `skip_if_unchanged` | Skip version bump/publish if the local npm tarball matches the latest published tarball (ignoring version/gitHead) | No | `false` |
 | `npm_token` | NPM authentication token | No (required if `publish_npm` is true) | - |
 | `github_token` | GitHub token for releases and packages | Yes | - |
 
@@ -117,7 +117,7 @@ jobs:
 1. **Checkout**: Checks out the repository at the specified ref
 2. **Setup**: Configures pnpm and Node.js environment
 3. **Dependencies**: Installs project dependencies
-4. **Optional compare**: When `skip_if_unchanged` is true, compares local `package.json` + `dist` with the latest npm package and skips release if identical
+4. **Optional compare**: When `skip_if_unchanged` is true, compares the local npm tarball with the latest published tarball (ignoring version/gitHead) and skips release if identical
 5. **Changeset**: Creates automatic changeset if none exists
 6. **Version**: Bumps package version using changesets
 7. **Commit**: Commits version changes back to the branch
