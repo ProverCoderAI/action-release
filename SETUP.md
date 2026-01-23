@@ -61,7 +61,7 @@ Test that other repositories can use the action:
 
 ```yaml
 # In another repository's workflow
-- uses: ProverCoderAI/action-release@v1.0.10
+- uses: ProverCoderAI/action-release@v1.0.11
   with:
     ref: ${{ github.sha }}
     github_token: ${{ secrets.GITHUB_TOKEN }}
