@@ -93,6 +93,10 @@ permissions:
 - `GITHUB_TOKEN` - Automatically provided by GitHub Actions
 - `NPM_TOKEN` - Required if publishing to npm (optional)
 
+### Optional Behavior
+
+- `skip_if_unchanged` - When enabled, the action compares local `package.json` + `dist` with the latest npm package and skips the release if identical. For private npm packages, provide `NPM_TOKEN` so the comparison can fetch the published tarball.
+
 ### Action Permissions Policy
 
 Ensure your repository allows this action:
