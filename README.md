@@ -1,6 +1,6 @@
 # ProverCoderAI Release Action
 
-Latest release: `v1.0.3` (auto-updated)
+Latest release: `v1.0.4` (auto-updated)
 
 A GitHub Action for automated releases with changeset management, version bumping, npm/GitHub Packages publishing, and GitHub Release creation.
 
@@ -39,7 +39,7 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: ProverCoderAI/action-release@v1
+      - uses: ProverCoderAI/action-release@v1.0.4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           branch: ${{ github.event.workflow_run.head_branch }}
@@ -74,7 +74,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: ProverCoderAI/action-release@v1
+      - uses: ProverCoderAI/action-release@v1.0.4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           branch: ${{ github.event.workflow_run.head_branch }}
@@ -145,7 +145,7 @@ permissions:
 ### Publish only to npm
 
 ```yaml
-- uses: ProverCoderAI/action-release@v1
+- uses: ProverCoderAI/action-release@v1.0.4
   with:
     ref: ${{ github.sha }}
     publish_npm: true
@@ -157,7 +157,7 @@ permissions:
 ### Custom version bump type
 
 ```yaml
-- uses: ProverCoderAI/action-release@v1
+- uses: ProverCoderAI/action-release@v1.0.4
   with:
     ref: ${{ github.sha }}
     bump_type: minor  # or 'major'
@@ -167,7 +167,7 @@ permissions:
 ### Different Node.js version
 
 ```yaml
-- uses: ProverCoderAI/action-release@v1
+- uses: ProverCoderAI/action-release@v1.0.4
   with:
     ref: ${{ github.sha }}
     node_version: "20"
