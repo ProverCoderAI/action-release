@@ -96,7 +96,8 @@ permissions:
 ### Optional Behavior
 
 - `skip_if_unchanged` - When enabled, the action compares the local npm tarball with the latest published tarball (ignoring version/gitHead) and skips the release if identical. For private npm packages, provide `NPM_TOKEN` so the comparison can fetch the published tarball.
-- `neutral_on_no_changes` - When enabled, the action exits with code 78 (neutral/gray) if no changes are detected.
+- `neutral_on_no_changes` - When enabled, the action stops early without failing if no changes are detected.
+- `cancel_on_no_changes` - When enabled, the action cancels the workflow run (requires `actions: write` permission).
 
 ### Action Permissions Policy
 

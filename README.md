@@ -100,7 +100,8 @@ jobs:
 | `publish_npm` | Whether to publish to npm registry | No | `true` |
 | `publish_github_packages` | Whether to publish to GitHub Packages | No | `true` |
 | `skip_if_unchanged` | Skip version bump/publish if the local npm tarball matches the latest published tarball (ignoring version/gitHead) | No | `false` |
-| `neutral_on_no_changes` | Mark workflow as neutral (exit 78) when no changes are detected | No | `false` |
+| `neutral_on_no_changes` | Stop early without failing when no changes are detected | No | `false` |
+| `cancel_on_no_changes` | Cancel the workflow run when no changes are detected (requires `actions: write`) | No | `false` |
 | `npm_token` | NPM authentication token | No (required if `publish_npm` is true) | - |
 | `github_token` | GitHub token for releases and packages | Yes | - |
 
