@@ -21,6 +21,7 @@ on:
 
 jobs:
   create-tags:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -57,6 +58,52 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update README with latest release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          full_version = os.environ["FULL_VERSION"]
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          line = f"Latest release: `{full_version}` (auto-updated)"
+
+          if re.search(r"^Latest release:.*$", text, flags=re.M):
+            text = re.sub(r"^Latest release:.*$", line, text, flags=re.M)
+          else:
+            lines = text.splitlines()
+            if lines:
+              lines.insert(1, "")
+              lines.insert(2, line)
+              text = "\n".join(lines) + "\n"
+            else:
+              text = f"{line}\n"
+
+          if not text.endswith("\n"):
+            text += "\n"
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Commit README update
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet README.md; then
+            echo "README is already up to date."
+            exit 0
+          fi
+
+          git add README.md
+          git commit -m "chore(release): update README for ${FULL_VERSION}"
+          git fetch origin main
+          git rebase origin/main
+          git push origin "HEAD:main"
 
       - name: Create semantic version tag
         run: |

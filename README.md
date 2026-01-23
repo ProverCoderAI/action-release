@@ -1,5 +1,7 @@
 # ProverCoderAI Release Action
 
+Latest release: _auto-updated by CI_
+
 A GitHub Action for automated releases with changeset management, version bumping, npm/GitHub Packages publishing, and GitHub Release creation.
 
 > **Note**: For initial setup instructions and tag creation, see [SETUP.md](SETUP.md)
