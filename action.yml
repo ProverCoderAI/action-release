@@ -138,11 +138,27 @@ runs:
           exit 0
         fi
 
+        DIST_DIR="${PKG_DIR}/dist"
+        BACKUP_PKG="${PKG_DIR}/.package.json.release.bak"
+        cp "$PKG_PATH" "$BACKUP_PKG"
+
+        pnpm dlx @prover-coder-ai/dist-deps-prune apply \
+          --dist "${DIST_DIR}" \
+          --package "${PKG_PATH}" \
+          --prune-dev true \
+          --write \
+          --silent
+
         if ! LOCAL_TARBALL="$(cd "$PKG_DIR" && npm pack --silent --pack-destination "$TMP_DIR" | tail -n 1)"; then
+          cp "$BACKUP_PKG" "$PKG_PATH"
+          rm -f "$BACKUP_PKG"
           echo "Unable to pack local ${PKG_NAME}; proceeding with release."
           echo "should_release=true" >> "$GITHUB_OUTPUT"
           exit 0
         fi
+
+        cp "$BACKUP_PKG" "$PKG_PATH"
+        rm -f "$BACKUP_PKG"
 
         LOCAL_DIR="${TMP_DIR}/local"
         REMOTE_DIR="${TMP_DIR}/remote"
