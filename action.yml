@@ -54,6 +54,10 @@ inputs:
     description: "Skip version bump and publish if package.json and dist match the latest npm package"
     required: false
     default: "false"
+  neutral_on_no_changes:
+    description: "Mark workflow as neutral (exit 78) when no changes are detected"
+    required: false
+    default: "false"
   npm_token:
     description: "NPM authentication token (required if publish_npm is true)"
     required: false
@@ -175,6 +179,14 @@ runs:
           git stash push -u -m "precompare-build"
           git stash drop >/dev/null 2>&1 || true
         fi
+
+    - name: Stop with neutral status on no changes
+      if: inputs.neutral_on_no_changes == 'true' && steps.compare_npm.outputs.should_release == 'false'
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "::notice::No changes detected; marking workflow neutral."
+        exit 78
 
     - name: Auto changeset (patch if no changeset exists)
       id: auto_changeset
