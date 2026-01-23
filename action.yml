@@ -124,13 +124,13 @@ runs:
         TMP_DIR="$(mktemp -d)"
         trap 'rm -rf "$TMP_DIR"' EXIT
 
-        if ! REMOTE_TARBALL="$(npm pack "${PKG_NAME}@${LATEST_VERSION}" --silent --pack-destination "$TMP_DIR" 2>/dev/null)"; then
+        if ! REMOTE_TARBALL="$(npm pack "${PKG_NAME}@${LATEST_VERSION}" --silent --pack-destination "$TMP_DIR" 2>/dev/null | tail -n 1)"; then
           echo "Unable to download ${PKG_NAME}@${LATEST_VERSION}; proceeding with release."
           echo "should_release=true" >> "$GITHUB_OUTPUT"
           exit 0
         fi
 
-        if ! LOCAL_TARBALL="$(cd "$PKG_DIR" && npm pack --silent --pack-destination "$TMP_DIR")"; then
+        if ! LOCAL_TARBALL="$(cd "$PKG_DIR" && npm pack --silent --pack-destination "$TMP_DIR" | tail -n 1)"; then
           echo "Unable to pack local ${PKG_NAME}; proceeding with release."
           echo "should_release=true" >> "$GITHUB_OUTPUT"
           exit 0
@@ -139,6 +139,9 @@ runs:
         LOCAL_DIR="${TMP_DIR}/local"
         REMOTE_DIR="${TMP_DIR}/remote"
         mkdir -p "$LOCAL_DIR" "$REMOTE_DIR"
+
+        LOCAL_TARBALL="$(basename "$LOCAL_TARBALL")"
+        REMOTE_TARBALL="$(basename "$REMOTE_TARBALL")"
 
         tar -xzf "${TMP_DIR}/${LOCAL_TARBALL}" -C "$LOCAL_DIR"
         tar -xzf "${TMP_DIR}/${REMOTE_TARBALL}" -C "$REMOTE_DIR"
