@@ -1,6 +1,6 @@
 # ProverCoderAI Release Action
 
-Latest release: _auto-updated by CI_
+Latest release: `v1.0.2` (auto-updated)
 
 A GitHub Action for automated releases with changeset management, version bumping, npm/GitHub Packages publishing, and GitHub Release creation.
 
