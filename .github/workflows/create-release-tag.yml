@@ -69,38 +69,59 @@ jobs:
           from pathlib import Path
 
           full_version = os.environ["FULL_VERSION"]
-          path = Path("README.md")
-          text = path.read_text(encoding="utf-8")
-          line = f"Latest release: `{full_version}` (auto-updated)"
+          usage_pattern = re.compile(
+              r"^(?P<prefix>\s*-?\s*uses:\s*ProverCoderAI/action-release@)"
+              r"v\d+(?:\.\d+){0,2}\b",
+              flags=re.M,
+          )
 
-          if re.search(r"^Latest release:.*$", text, flags=re.M):
-            text = re.sub(r"^Latest release:.*$", line, text, flags=re.M)
-          else:
-            lines = text.splitlines()
-            if lines:
-              lines.insert(1, "")
-              lines.insert(2, line)
-              text = "\n".join(lines) + "\n"
-            else:
-              text = f"{line}\n"
+          def update_readme(text: str) -> str:
+              line = f"Latest release: `{full_version}` (auto-updated)"
 
-          if not text.endswith("\n"):
-            text += "\n"
+              if re.search(r"^Latest release:.*$", text, flags=re.M):
+                  text = re.sub(r"^Latest release:.*$", line, text, flags=re.M)
+              else:
+                  lines = text.splitlines()
+                  if lines:
+                      lines.insert(1, "")
+                      lines.insert(2, line)
+                      text = "\n".join(lines) + "\n"
+                  else:
+                      text = f"{line}\n"
 
-          path.write_text(text, encoding="utf-8")
+              text = usage_pattern.sub(rf"\g<prefix>{full_version}", text)
+
+              if not text.endswith("\n"):
+                  text += "\n"
+              return text
+
+          def update_usage_examples(text: str) -> str:
+              text = usage_pattern.sub(rf"\g<prefix>{full_version}", text)
+              if not text.endswith("\n"):
+                  text += "\n"
+              return text
+
+          readme_path = Path("README.md")
+          readme_text = readme_path.read_text(encoding="utf-8")
+          readme_path.write_text(update_readme(readme_text), encoding="utf-8")
+
+          setup_path = Path("SETUP.md")
+          if setup_path.exists():
+              setup_text = setup_path.read_text(encoding="utf-8")
+              setup_path.write_text(update_usage_examples(setup_text), encoding="utf-8")
           PY
 
       - name: Commit README update
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet README.md; then
-            echo "README is already up to date."
+          if git diff --quiet README.md SETUP.md; then
+            echo "Docs are already up to date."
             exit 0
           fi
 
-          git add README.md
-          git commit -m "chore(release): update README for ${FULL_VERSION}"
+          git add README.md SETUP.md
+          git commit -m "chore(release): update docs for ${FULL_VERSION}"
           git fetch origin main
           git rebase origin/main
           git push origin "HEAD:main"
