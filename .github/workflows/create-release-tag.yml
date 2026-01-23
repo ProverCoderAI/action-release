@@ -1,14 +1,17 @@
 name: Create Release Tags
 
-# This workflow automatically creates and pushes release tags when manually triggered
-# It's designed to make the action ready for use in other repositories
+# This workflow creates and pushes release tags for every commit to main,
+# and also supports manual tagging via workflow_dispatch.
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number (e.g., 1.0.0)'
-        required: true
+        description: 'Version number (e.g., 1.0.0). Leave empty to auto-generate.'
+        required: false
         type: string
       create_release:
         description: 'Create GitHub Release'
@@ -31,7 +34,12 @@ jobs:
 
       - name: Validate version format
         run: |
-          VERSION="${{ github.event.inputs.version }}"
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          if [ -n "${INPUT_VERSION:-}" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="1.0.${{ github.run_number }}"
+          fi
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Error: Version must be in semver format (e.g., 1.0.0)"
             exit 1
@@ -53,6 +61,10 @@ jobs:
       - name: Create semantic version tag
         run: |
           echo "Creating tag ${FULL_VERSION}..."
+          if git rev-parse "$FULL_VERSION" >/dev/null 2>&1; then
+            echo "Tag ${FULL_VERSION} already exists; skipping."
+            exit 0
+          fi
           git tag -a "$FULL_VERSION" -m "${FULL_VERSION} - Release of ProverCoderAI Release Action"
           git push origin "$FULL_VERSION"
 
@@ -76,7 +88,7 @@ jobs:
           echo "  - uses: ProverCoderAI/action-release@${FULL_VERSION}"
 
       - name: Create GitHub Release
-        if: github.event.inputs.create_release == 'true'
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.FULL_VERSION }}
