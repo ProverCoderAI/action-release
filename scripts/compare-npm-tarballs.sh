@@ -14,7 +14,7 @@ Options:
   --build <cmd>       Build command to run before compare (optional)
   --readme-source <p> Source README to copy before compare (optional)
   --readme-dest <p>   Destination README path to copy to (optional)
-  --prune-dev <bool>  Whether to prune devDependencies (default: true)
+  --prune-dev <bool>  Whether to prune devDependencies (optional)
   --npm-token <tok>   npm token for private packages (optional)
   --show-diff         Show unified diff for differing files
   -h, --help          Show this help
@@ -27,7 +27,8 @@ DIST_PATH_SET="false"
 BUILD_CMD=""
 README_SOURCE=""
 README_DEST=""
-PRUNE_DEV="true"
+PRUNE_DEV=""
+PRUNE_DEV_SET="false"
 NPM_TOKEN=""
 SHOW_DIFF="false"
 
@@ -56,6 +57,7 @@ while [ $# -gt 0 ]; do
       ;;
     --prune-dev)
       PRUNE_DEV="$2"
+      PRUNE_DEV_SET="true"
       shift 2
       ;;
     --npm-token)
@@ -176,11 +178,15 @@ PRUNE_DIST_ARGS=()
 if [ "$DIST_PATH_SET" = "true" ]; then
   PRUNE_DIST_ARGS=(--dist "$DIST_PATH")
 fi
+PRUNE_DEV_ARGS=()
+if [ "$PRUNE_DEV_SET" = "true" ]; then
+  PRUNE_DEV_ARGS=(--prune-dev "$PRUNE_DEV")
+fi
 
 pnpm dlx @prover-coder-ai/dist-deps-prune apply \
   "${PRUNE_DIST_ARGS[@]}" \
+  "${PRUNE_DEV_ARGS[@]}" \
   --package "$PKG_PATH" \
-  --prune-dev "$PRUNE_DEV" \
   --write \
   --silent
 

@@ -192,7 +192,6 @@ runs:
 
         pnpm dlx @prover-coder-ai/dist-deps-prune apply \
           --package "${PKG_PATH}" \
-          --prune-dev true \
           --write \
           --silent
 
@@ -404,7 +403,6 @@ runs:
 
         pnpm dlx @prover-coder-ai/dist-deps-prune release \
           --package "${PKG_PATH}" \
-          --prune-dev true \
           --command "pnpm changeset publish" \
           --silent
 
