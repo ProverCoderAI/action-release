@@ -190,6 +190,7 @@ runs:
 
         cp "$PKG_PATH" "$BACKUP_PKG"
 
+        echo "dist-deps-prune version: $(pnpm dlx @prover-coder-ai/dist-deps-prune --version 2>/dev/null || true)"
         pnpm dlx @prover-coder-ai/dist-deps-prune apply \
           --package "${PKG_PATH}" \
           --write \
@@ -401,6 +402,7 @@ runs:
           exit 0
         fi
 
+        echo "dist-deps-prune version: $(pnpm dlx @prover-coder-ai/dist-deps-prune --version 2>/dev/null || true)"
         pnpm dlx @prover-coder-ai/dist-deps-prune release \
           --package "${PKG_PATH}" \
           --command "pnpm changeset publish" \
