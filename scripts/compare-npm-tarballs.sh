@@ -10,7 +10,7 @@ published tarball for the package.
 
 Options:
   --package <path>    Path to package.json (default: packages/app/package.json)
-  --dist <path>       Path to dist directory (default: <package-dir>/dist)
+  --dist <path>       Path to dist directory override (optional)
   --build <cmd>       Build command to run before compare (optional)
   --readme-source <p> Source README to copy before compare (optional)
   --readme-dest <p>   Destination README path to copy to (optional)
@@ -23,6 +23,7 @@ USAGE
 
 PKG_PATH="packages/app/package.json"
 DIST_PATH=""
+DIST_PATH_SET="false"
 BUILD_CMD=""
 README_SOURCE=""
 README_DEST=""
@@ -38,6 +39,7 @@ while [ $# -gt 0 ]; do
       ;;
     --dist)
       DIST_PATH="$2"
+      DIST_PATH_SET="true"
       shift 2
       ;;
     --build)
@@ -89,16 +91,13 @@ if [ ! -f "$PKG_PATH" ]; then
 fi
 
 PKG_DIR="$(dirname "$PKG_PATH")"
-if [ -z "$DIST_PATH" ]; then
-  DIST_PATH="${PKG_DIR}/dist"
-fi
 
 if [ -n "$BUILD_CMD" ]; then
   echo "> Running build: $BUILD_CMD"
   bash -lc "$BUILD_CMD"
 fi
 
-if [ ! -d "$DIST_PATH" ]; then
+if [ "$DIST_PATH_SET" = "true" ] && [ ! -d "$DIST_PATH" ]; then
   echo "dist directory not found: $DIST_PATH" >&2
   exit 1
 fi
@@ -173,8 +172,13 @@ fi
 
 cp "$PKG_PATH" "$BACKUP_PKG"
 
+PRUNE_DIST_ARGS=()
+if [ "$DIST_PATH_SET" = "true" ]; then
+  PRUNE_DIST_ARGS=(--dist "$DIST_PATH")
+fi
+
 pnpm dlx @prover-coder-ai/dist-deps-prune apply \
-  --dist "$DIST_PATH" \
+  "${PRUNE_DIST_ARGS[@]}" \
   --package "$PKG_PATH" \
   --prune-dev "$PRUNE_DEV" \
   --write \

@@ -163,7 +163,6 @@ runs:
           exit 0
         fi
 
-        DIST_DIR="${PKG_DIR}/dist"
         BACKUP_PKG="${PKG_DIR}/.package.json.release.bak"
         README_SOURCE=""
         README_DEST=""
@@ -192,7 +191,6 @@ runs:
         cp "$PKG_PATH" "$BACKUP_PKG"
 
         pnpm dlx @prover-coder-ai/dist-deps-prune apply \
-          --dist "${DIST_DIR}" \
           --package "${PKG_PATH}" \
           --prune-dev true \
           --write \
@@ -396,7 +394,6 @@ runs:
         set -euo pipefail
         PKG_PATH="${{ inputs.package_json_path }}"
         PKG_DIR="$(dirname "$PKG_PATH")"
-        DIST_DIR="${PKG_DIR}/dist"
         PKG_NAME="$(node -p "require('./${PKG_PATH}').name")"
         VERSION="$(node -p "require('./${PKG_PATH}').version")"
 
@@ -406,7 +403,6 @@ runs:
         fi
 
         pnpm dlx @prover-coder-ai/dist-deps-prune release \
-          --dist "${DIST_DIR}" \
           --package "${PKG_PATH}" \
           --prune-dev true \
           --command "pnpm changeset publish" \
